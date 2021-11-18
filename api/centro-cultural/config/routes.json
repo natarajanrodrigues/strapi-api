@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/centro-culturals",
+      "handler": "centro-cultural.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/centro-culturals/count",
+      "handler": "centro-cultural.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/centro-culturals/:id",
+      "handler": "centro-cultural.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/centro-culturals",
+      "handler": "centro-cultural.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/centro-culturals/:id",
+      "handler": "centro-cultural.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/centro-culturals/:id",
+      "handler": "centro-cultural.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

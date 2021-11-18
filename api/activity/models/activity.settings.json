@@ -1,0 +1,82 @@
+{
+  "kind": "collectionType",
+  "collectionName": "activities",
+  "info": {
+    "name": "Activity",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "artistOrGroup": {
+      "type": "string",
+      "required": true
+    },
+    "release": {
+      "type": "richtext",
+      "required": true
+    },
+    "presentations": {
+      "type": "component",
+      "repeatable": true,
+      "component": "cultura.presentation",
+      "required": true,
+      "min": 1
+    },
+    "photos": {
+      "collection": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images"
+      ],
+      "plugin": "upload",
+      "required": false,
+      "pluginOptions": {}
+    },
+    "durationInMinutes": {
+      "type": "integer",
+      "required": true
+    },
+    "classification": {
+      "type": "enumeration",
+      "enum": [
+        "livre",
+        "anos10",
+        "anos12",
+        "anos14",
+        "anos16",
+        "anos18"
+      ],
+      "default": "livre",
+      "required": true
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "area": {
+      "type": "string",
+      "required": true
+    },
+    "program": {
+      "type": "string",
+      "required": true
+    },
+    "agendas": {
+      "via": "activities",
+      "collection": "agenda-content"
+    },
+    "origem": {
+      "type": "string"
+    }
+  }
+}

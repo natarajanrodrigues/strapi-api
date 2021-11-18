@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "agenda_contents",
+  "info": {
+    "name": "AgendaContent",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "initDate": {
+      "type": "date",
+      "required": true
+    },
+    "centro_culturals": {
+      "collection": "centro-cultural",
+      "via": "agenda_contents",
+      "dominant": true
+    },
+    "cover": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images"
+      ],
+      "plugin": "upload",
+      "required": true,
+      "pluginOptions": {}
+    },
+    "openingDates": {
+      "type": "json"
+    },
+    "activities": {
+      "via": "agendas",
+      "model": "activity"
+    }
+  }
+}

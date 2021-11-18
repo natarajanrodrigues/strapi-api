@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_cultura_presentations",
+  "info": {
+    "name": "Presentation",
+    "icon": "swatchbook"
+  },
+  "options": {},
+  "attributes": {
+    "dateAndTime": {
+      "type": "datetime",
+      "required": true
+    },
+    "address": {
+      "type": "text"
+    }
+  }
+}

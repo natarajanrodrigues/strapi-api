@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "centro_culturals",
+  "info": {
+    "name": "CentroCultural",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "shortName": {
+      "type": "string",
+      "required": true
+    },
+    "cover": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images"
+      ],
+      "plugin": "upload",
+      "required": false,
+      "pluginOptions": {}
+    },
+    "agenda_contents": {
+      "via": "centro_culturals",
+      "collection": "agenda-content"
+    }
+  }
+}
