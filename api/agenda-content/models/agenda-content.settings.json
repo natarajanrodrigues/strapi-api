@@ -12,9 +12,18 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "slug": {
+      "type": "uid",
+      "required": true,
+      "targetField": "name"
+    },
     "name": {
       "type": "string",
       "required": true
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
     },
     "initDate": {
       "type": "date",
@@ -32,15 +41,12 @@
         "images"
       ],
       "plugin": "upload",
-      "required": true,
+      "required": false,
       "pluginOptions": {}
     },
-    "openingDates": {
-      "type": "json"
-    },
     "activities": {
-      "via": "agendas",
-      "model": "activity"
+      "via": "agenda_contents",
+      "collection": "activity"
     }
   }
 }

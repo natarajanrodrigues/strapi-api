@@ -33,6 +33,10 @@
       "required": false,
       "pluginOptions": {}
     },
+    "slug": {
+      "type": "uid",
+      "targetField": "shortName"
+    },
     "agenda_contents": {
       "via": "centro_culturals",
       "collection": "agenda-content"

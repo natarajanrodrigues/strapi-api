@@ -71,12 +71,13 @@
       "type": "string",
       "required": true
     },
-    "agendas": {
-      "via": "activities",
-      "collection": "agenda-content"
-    },
     "origem": {
       "type": "string"
+    },
+    "agenda_contents": {
+      "via": "activities",
+      "collection": "agenda-content",
+      "dominant": true
     }
   }
 }
