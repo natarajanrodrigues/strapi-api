@@ -15,6 +15,7 @@
     "knex": "0.21.18",
     "moment": "^2.29.1",
     "pg": "8.5.1",
+    "query-string": "^7.0.1",
     "querystring": "^0.2.1",
     "strapi": "3.6.8",
     "strapi-admin": "3.6.8",

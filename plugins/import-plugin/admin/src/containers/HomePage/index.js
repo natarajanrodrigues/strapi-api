@@ -12,11 +12,17 @@ import moment from "moment"
 import { Flex, DatePicker, Padded, Select } from "@buffetjs/core"
 import * as S from "./styles"
 
+const qs = require("querystring")
+
+const queryString = require("query-string")
+
 // import PropTypes from 'prop-types';
 import pluginId from "../../pluginId"
 
 const getUrl = (to) =>
   to ? `/plugins/${pluginId}/${to}` : `/plugins/${pluginId}`
+
+const ccbnbMap = { SOUSA: 1, CARIRI: 2, FORTALEZA: 3 }
 
 const HomePage = () => {
   // prettier-ignore
@@ -26,6 +32,8 @@ const HomePage = () => {
   const [initDate, setInitDate] = useState(moment())
   const [finalDate, setFinalDate] = useState(moment())
   const [ccbnb, setCcbnb] = useState("SOUSA")
+  const [agenda, setAgenda] = useState("")
+  const [agendas, setAgendas] = useState([])
 
   const [rows, setRows] = useState([])
 
@@ -38,13 +46,26 @@ const HomePage = () => {
   const [code2, setCode2] = useState("")
 
   useEffect(() => {
-    axios
-      .get("http://localhost:1337/import-plugin")
-      .then((res) => {
-        setCode(JSON.stringify(res))
-      })
-      .catch((e) => setCode("Deu erro " + e))
+    async function fn() {
+      const c = await axios
+        .get("http://localhost:1337/agenda-contents")
+        .then((res) => {
+          console.log(res)
+          const agendas = res.data.map((agenda) => `${agenda.slug}`)
+          setAgendas(agendas)
+        })
+        .catch((e) => setCode("Deu erro " + e))
+    }
+    fn()
   }, [])
+
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const x = await axios
+  //       .get("http://localhost:1337/api/activities")
+  //       .then((res) => console.log("aqui", res))
+  //   }
+  // }, [])
 
   const checkAll = (event) => {
     event.preventDefault()
@@ -55,28 +76,48 @@ const HomePage = () => {
     event.preventDefault()
 
     const form = {
-      ccbnb: ccbnb,
-      initDate: initDate.format("DD/MM/yyyy"),
+      unit: ccbnbMap[ccbnb],
+      initialDate: initDate.format("DD/MM/yyyy"),
       finalDate: finalDate.format("DD/MM/yyyy")
     }
     // setCode2(JSON.stringify(form))
 
-    // await axios.get("http://127.0.0.1:3000/atividades/1").then(({ data }) => {
-    //   setCode2(JSON.stringify(data.mock))
-    //   setRows(data.mock)
-    // })
+    // const myUrl = `https://siscultural.herokuapp.com/agenda/select_import2?${qs.stringify(
+    //   form
+    // )}`
 
-    const mock = [
-      {
-        id: 1,
-        titulo: "As aventuras de Ananse",
-        grupoArtista: "Cia Beradeiros em Cena",
-        release: "Lorem",
-        duracao: 45
-      }
-    ]
+    // const myUrl = `https://siscultural.herokuapp.com/agenda/select_import2?${queryString.stringify(
+    const myUrl = `https://localhost:8080/agenda/select_import2?${queryString.stringify(
+      form
+    )}`
 
-    setRows(mock)
+    axios.defaults.headers.get["Access-Control-Allow-Origin"] = "*"
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    }
+
+    await axios
+      // .get(myUrl, { headers: { "Access-Control-Allow-Origin": "*" } })
+      .get(myUrl, { headers: headers })
+      .then(({ data }) => {
+        // setCode2(JSON.stringify(data.mock))
+        console.log(JSON.stringify(data))
+        setRows(data)
+        setCode2(data)
+      })
+
+    // const mock = [
+    //   {
+    //     id: 1,
+    //     titulo: "As aventuras de Ananse",
+    //     grupoArtista: "Cia Beradeiros em Cena",
+    //     release: "Lorem",
+    //     duracao: 45
+    //   }
+    // ]
+
+    // setRows(mock)
   }
 
   const handleCheck = (event) => {
@@ -135,16 +176,36 @@ const HomePage = () => {
               />
             </S.InputGroupWrapper>
           </S.InputGroupWrapper>
+
           <S.Button onClick={handleSubmit}>Buscar</S.Button>
-          {/* {code2} */}
+
+          {agendas && agendas.length > 0 && (
+            <S.InputGroupWrapper>
+              <b>Importar Atividades para a Agenda</b>
+              <S.InputGroupWrapper>
+                <Select
+                  name="select"
+                  onChange={({ target: { value } }) => {
+                    setAgenda(value)
+                  }}
+                  options={agendas}
+                  value={agenda}
+                />
+              </S.InputGroupWrapper>
+            </S.InputGroupWrapper>
+          )}
+
+          {code2}
         </S.Wrapper>
       </Flex>
-      {/* <br />
-      {code2}
-      <br /> */}
+      <br />
+      {agendas &&
+        agendas.length > 0 &&
+        agendas.map((s) => <div key={`agenda ${s}`}>{JSON.stringify(s)}</div>)}
+      <br />
       <br />
       AQUI
-      {selectedIds && selectedIds.map((s) => <div>{s}</div>)}
+      {selectedIds && selectedIds.map((s) => <div key="${s}">{s}</div>)}
       <br />
       {rows?.length > 0 && (
         <>

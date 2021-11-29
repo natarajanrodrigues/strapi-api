@@ -75,6 +75,7 @@
       "type": "string"
     },
     "agenda_contents": {
+      "private": true,
       "via": "activities",
       "collection": "agenda-content",
       "dominant": true
