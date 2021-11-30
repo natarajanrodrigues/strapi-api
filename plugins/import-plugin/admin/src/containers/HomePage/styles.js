@@ -33,3 +33,6 @@ export const InputForm = styled.div`
     margin: 0.4rem;
   }
 `
+export const NoBullentUl = styled.ul`
+  list-style-type: none;
+`

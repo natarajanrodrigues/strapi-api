@@ -9,7 +9,7 @@ import React, { memo, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { HeaderNav, LoadingIndicator, PluginHeader } from "strapi-helper-plugin"
 import moment from "moment"
-import { Flex, DatePicker, Padded, Select } from "@buffetjs/core"
+import { Flex, DatePicker, Padded, Select, Checkbox } from "@buffetjs/core"
 import * as S from "./styles"
 
 const qs = require("querystring")
@@ -25,8 +25,36 @@ const getUrl = (to) =>
 const ccbnbMap = { SOUSA: 1, CARIRI: 2, FORTALEZA: 3 }
 
 const HomePage = () => {
-  // prettier-ignore
+  // checkBox
+  const message = areAllCheckboxesSelected ? "Desmarcar tudo" : "Marcar tudo"
+  const [value, setValue] = useState(false)
+  const [checkboxes, setCheckboxValue] = useState({})
+  const areAllCheckboxesSelected = Object.keys(checkboxes).every(
+    (key) => checkboxes[key] === true
+  )
 
+  const hasSomeCheckboxesSelected = Object.keys(checkboxes).some(
+    (key) => checkboxes[key] === true
+  )
+
+  // const hasSomeCheckboxesSelected = rows
+  //   .map((r) => r)
+  //   .some((r) => r.checked === true)
+
+  const handleChange = () => {
+    const valueToSet = !areAllCheckboxesSelected
+
+    setCheckboxValue((prevState) => {
+      return Object.keys(prevState).reduce((acc, current) => {
+        acc[current] = valueToSet
+
+        return acc
+      }, {})
+    })
+  }
+  // end checkboxes
+
+  // prettier-ignore
   const options = ["SOUSA", "CARIRI", "FORTALEZA"]
 
   const [initDate, setInitDate] = useState(moment())
@@ -35,15 +63,12 @@ const HomePage = () => {
   const [agenda, setAgenda] = useState("")
   const [agendas, setAgendas] = useState([])
 
-  const [rows, setRows] = useState([])
+  const [rows, setRows] = useState({})
 
   const [checked, setChecked] = useState(false)
   const [selectedIds, setSelectedIds] = useState(["2"])
 
   let selecteds = new Set()
-
-  const [code, setCode] = useState("")
-  const [code2, setCode2] = useState("")
 
   useEffect(() => {
     async function fn() {
@@ -80,56 +105,55 @@ const HomePage = () => {
       initialDate: initDate.format("DD/MM/yyyy"),
       finalDate: finalDate.format("DD/MM/yyyy")
     }
-    // setCode2(JSON.stringify(form))
 
     // const myUrl = `https://siscultural.herokuapp.com/agenda/select_import2?${qs.stringify(
     //   form
     // )}`
 
     // const myUrl = `https://siscultural.herokuapp.com/agenda/select_import2?${queryString.stringify(
-    const myUrl = `https://localhost:8080/agenda/select_import2?${queryString.stringify(
+    const myUrl = `http://localhost:8080/agenda/select_import2?${queryString.stringify(
       form
     )}`
 
-    axios.defaults.headers.get["Access-Control-Allow-Origin"] = "*"
-    const headers = {
-      "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application/json"
-    }
-
     await axios
-      // .get(myUrl, { headers: { "Access-Control-Allow-Origin": "*" } })
-      .get(myUrl, { headers: headers })
+      .get(myUrl, { headers: { "Access-Control-Allow-Origin": "*" } })
       .then(({ data }) => {
-        // setCode2(JSON.stringify(data.mock))
-        console.log(JSON.stringify(data))
-        setRows(data)
-        setCode2(data)
+        // const rows = data?.ativs?.map((ativ) => {
+        //   return { ...ativ, checked: false }
+        // })
+        // setRows(rows)
+
+        const rows = data?.ativs?.reduce((acc, current) => {
+          acc[current.id] = current
+          return acc
+        }, {})
+        setRows(rows)
+        // console.log("rows", rows)
+
+        const checkboxes = data?.ativs
+          ?.map((ativ) => {
+            return ativ.id
+          })
+          .reduce((acc, current) => {
+            acc[current] = false
+
+            return acc
+          }, {})
+
+        setCheckboxValue(checkboxes)
       })
-
-    // const mock = [
-    //   {
-    //     id: 1,
-    //     titulo: "As aventuras de Ananse",
-    //     grupoArtista: "Cia Beradeiros em Cena",
-    //     release: "Lorem",
-    //     duracao: 45
-    //   }
-    // ]
-
-    // setRows(mock)
   }
 
   const handleCheck = (event) => {
     const id = event.target.id
-    // console.log(selectedIds.includes(id))
-    if (selectfedIds?.includes(id)) {
-      console.log("no no no")
-      // setSelectedIds((prev) => new Set([...prev].filter((x) => x !== id)))
-    } else {
-      console.log("nao tinha ainda")
-      setSelectedIds((prev) => prev.push(id))
-    }
+    // // console.log(selectedIds.includes(id))
+    // if (selectfedIds?.includes(id)) {
+    //   console.log("no no no")
+    //   // setSelectedIds((prev) => new Set([...prev].filter((x) => x !== id)))
+    // } else {
+    //   console.log("nao tinha ainda")
+    //   setSelectedIds((prev) => prev.push(id))
+    // }
   }
 
   return (
@@ -163,6 +187,7 @@ const HomePage = () => {
               value={finalDate}
             />
           </S.InputGroupWrapper>
+
           <S.InputGroupWrapper>
             <b>CCBNB</b>
             <S.InputGroupWrapper>
@@ -178,6 +203,8 @@ const HomePage = () => {
           </S.InputGroupWrapper>
 
           <S.Button onClick={handleSubmit}>Buscar</S.Button>
+
+          <hr />
 
           {agendas && agendas.length > 0 && (
             <S.InputGroupWrapper>
@@ -195,35 +222,47 @@ const HomePage = () => {
             </S.InputGroupWrapper>
           )}
 
-          {code2}
+          {Object.keys(rows).length > 0 && (
+            <div>
+              <Checkbox
+                name="selectAll"
+                onChange={handleChange}
+                message={message}
+                someChecked={
+                  hasSomeCheckboxesSelected && !areAllCheckboxesSelected
+                }
+                value={areAllCheckboxesSelected}
+              />
+              <S.NoBullentUl>
+                {Object.keys(checkboxes).map((current) => {
+                  console.log("current", current)
+                  console.log("checkboxes", checkboxes)
+                  console.log("rowssss", rows)
+                  console.log(rows[current])
+                  // console.log(rows[current].nome)
+
+                  return (
+                    <li key={current} style={{ padding: 15 }}>
+                      <Checkbox
+                        name={current}
+                        // message={`ok ${current}`}
+                        // message={rows[current].nome}
+                        value={checkboxes[current]}
+                        onChange={({ target: { name, value } }) => {
+                          setCheckboxValue((prevState) => ({
+                            ...prevState,
+                            [name]: value
+                          }))
+                        }}
+                      />
+                    </li>
+                  )
+                })}
+              </S.NoBullentUl>
+            </div>
+          )}
         </S.Wrapper>
       </Flex>
-      <br />
-      {agendas &&
-        agendas.length > 0 &&
-        agendas.map((s) => <div key={`agenda ${s}`}>{JSON.stringify(s)}</div>)}
-      <br />
-      <br />
-      AQUI
-      {selectedIds && selectedIds.map((s) => <div key="${s}">{s}</div>)}
-      <br />
-      {rows?.length > 0 && (
-        <>
-          <S.Button onClick={checkAll}>Marcar todos</S.Button>
-          <br />
-          {rows.map((row) => (
-            <S.InputForm key={row.id}>
-              <input
-                type="checkbox"
-                id={row.id}
-                // checked={() => selected.filter(x == row.id)}
-                onChange={handleCheck}
-              />
-              <label>{row.titulo}</label>
-            </S.InputForm>
-          ))}
-        </>
-      )}
     </Padded>
   )
 }
